@@ -98,6 +98,7 @@ router.get('/:id', async (req, res) => {
     `;
 
     html = html.replace('</head>', `${initialDataScript}</head>`);
+    html = html.replace('<span id="dinamic_title"></span>', `<span id="dinamic_title">${config.title}</span>`);
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
   } catch (error) {
