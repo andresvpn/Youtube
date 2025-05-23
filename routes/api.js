@@ -5,16 +5,21 @@ const yts = require('yt-search');
 // Endpoint para búsqueda de videos
 router.get('/search', async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, page } = req.query;
+
     if (!q) {
       return res.status(400).json({ error: 'Query parameter "q" is required' });
     }
-    
-    const searchResults = await yts(q);
+
+    const pages = Math.min(parseInt(page) || 3, 10); // usa 3 si no hay page, máximo 10
+
+    const searchResults = await yts({ query: q, pages });
+
     res.json({
       status: true,
       data: searchResults.videos
     });
+
   } catch (error) {
     console.error('Search error:', error);
     res.status(500).json({ error: 'Internal server error' });
