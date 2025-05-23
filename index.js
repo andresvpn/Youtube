@@ -10,12 +10,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Variables globales
 const SITE_NAME = 'PlayTube';
-const SITE_URL = 'https://playtube.vercel.app'; // Cambiar por tu dominio real
+const SITE_URL = 'https://playtube-zeta.vercel.app'; // Cambiar por tu dominio real
 const PRIMARY_COLOR = '#00C853';
 
 // Rutas
 app.get('/', async (req, res) => {
-    const query = req.query.q || 'twice';
+    const query = req.query.q || 'cosas que no sabias hace 5 minutos';
     
     try {
         const searchResults = await ytsr(query);
@@ -80,7 +80,8 @@ app.get('/watch', async (req, res) => {
 });
 
 // Iniciar servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const port = process.env.PORT || 8080 || 3000;
+
+app.listen(port, () => {
     console.log(`Servidor iniciado en http://localhost:${PORT}`);
 });
