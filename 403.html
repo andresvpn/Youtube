@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERROR 403 - Acceso Prohibido</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&family=Montserrat:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --dark: #111;
+            --light: #f0f0f0;
+        }
+        
+        /* Temas de color */
+        .theme-blue {
+            --primary: #4285f4;
+            --secondary: #34a853;
+        }
+        
+        .theme-red {
+            --primary: #ea4335;
+            --secondary: #fbbc05;
+        }
+        
+        .theme-orange {
+            --primary: #ff6d00;
+            --secondary: #ffab00;
+        }
+        
+        .theme-purple {
+            --primary: #9c27b0;
+            --secondary: #e91e63;
+        }
+        
+        .theme-green {
+            --primary: #0f9d58;
+            --secondary: #8bc34a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 2s ease-out;
+        }
+        
+        .error-code {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15rem;
+            font-weight: 900;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(51, 51, 255, 0.3);
+            margin-bottom: 1rem;
+            position: relative;
+            animation: glitch 1s linear infinite, float 3s ease-in-out infinite;
+        }
+        
+        .error-code::before, .error-code::after {
+            content: attr(data-error-code);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            z-index: -1;
+        }
+        
+        .error-code::before {
+            animation: glitch-top 1.5s linear infinite;
+            clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+        }
+        
+        .error-code::after {
+            animation: glitch-bottom 1.5s linear infinite;
+            clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%);
+        }
+        
+        .error-message {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+        
+        .error-description {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(51, 51, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(51, 51, 255, 0.5);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .forbidden-sign {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 20px solid var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: pulse 4s ease-out infinite;
+            z-index: -1;
+        }
+        
+        .forbidden-sign::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 350px;
+            height: 50px;
+            background: var(--primary);
+            transform: translate(-50%, -50%) rotate(45deg);
+            opacity: 0.1;
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleAnim 4s linear infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes glitch-top {
+            0% { transform: translate(0); }
+            20% { transform: translate(-10px, -5px); }
+            40% { transform: translate(-5px, 0); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(10px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes glitch-bottom {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 10px); }
+            40% { transform: translate(5px, -10px); }
+            60% { transform: translate(-5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        
+        @keyframes textGlow {
+            from { text-shadow: 0 0 10px rgba(51, 51, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(51, 51, 255, 0.8), 0 0 30px rgba(51, 51, 255, 0.6); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.05; }
+            100% { transform: scale(0.8); opacity: 0.1; }
+        }
+        
+        @keyframes particleAnim {
+            0% { transform: translate(0, 0); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)); opacity: 0; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 8rem;
+            }
+            
+            .error-message {
+                font-size: 1.5rem;
+            }
+            
+            .forbidden-sign {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .forbidden-sign::before {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="forbidden-sign"></div>
+    
+    <div class="container" id="error-container">
+        <!-- Contenido dinámico se insertará aquí -->
+    </div>
+
+    <script>
+        // Configuración centralizada
+        const config = {
+            theme: 'blue', // Tema (blue, red, orange, purple, green)
+            contact: "https://t.me/ANDRES_VPN", // Enlace de contacto (null para ocultar botón)
+            error: 403 // Código de error (403, 404, 500, 503, etc.)
+        };
+
+        // Mensajes de error personalizados
+        const errorMessages = {
+            400: {
+                title: "Solicitud Incorrecta",
+                description: "El servidor no puede procesar la solicitud debido a un error del cliente."
+            },
+            401: {
+                title: "No Autorizado",
+                description: "Debes autenticarte para acceder a este recurso."
+            },
+            403: {
+                title: "Acceso Prohibido",
+                description: "No tienes permiso para acceder a este recurso. El servidor ha denegado tu solicitud."
+            },
+            404: {
+                title: "Página No Encontrada",
+                description: "El recurso solicitado no existe o ha sido movido a otra ubicación."
+            },
+            500: {
+                title: "Error del Servidor",
+                description: "El servidor encontró una condición inesperada que le impidió completar la solicitud."
+            },
+            503: {
+                title: "Servicio No Disponible",
+                description: "El servidor no está listo para manejar la solicitud. Por favor, inténtalo de nuevo más tarde."
+            },
+            default: {
+                title: "Error Desconocido",
+                description: "Ha ocurrido un error inesperado. Por favor, contacta al administrador."
+            }
+        };
+
+        // Función para aplicar el tema configurado
+        function applyTheme() {
+            document.body.classList.add('theme-' + config.theme);
+        }
+
+        // Función para generar partículas
+        function generateParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 100;
+                const endX = startX + Math.cos(angle) * distance;
+                const endY = startY + Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--x', `${endX - startX}px`);
+                particle.style.setProperty('--y', `${endY - startY}px`);
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+                
+                const size = 2 + Math.random() * 3;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.animationDelay = `${Math.random() * 4}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Función para renderizar el error según la configuración
+        function renderError() {
+            const errorData = errorMessages[config.error] || errorMessages.default;
+            const container = document.getElementById('error-container');
+            
+            let buttonHTML = '';
+            if (config.contact) {
+                buttonHTML = `<a href="${config.contact}" class="btn">Contactar Soporte</a>`;
+            }
+            
+            container.innerHTML = `
+                <h1 class="error-code" data-error-code="${config.error}">${config.error}</h1>
+                <h2 class="error-message">${errorData.title}</h2>
+                <p class="error-description">
+                    ${errorData.description}
+                    ${config.error === 403 ? 'Si crees que esto es un error, por favor contacta al administrador.' : ''}
+                </p>
+                ${buttonHTML}
+            `;
+        }
+
+        // Efecto de cursor personalizado
+        document.addEventListener('mousemove', (e) => {
+            const forbiddenSign = document.querySelector('.forbidden-sign');
+            const x = e.clientX / window.innerWidth - 0.5;
+            const y = e.clientY / window.innerHeight - 0.5;
+            
+            forbiddenSign.style.transform = `translate(${x * 20}px, ${y * 20}px) rotate(${x * 10}deg)`;
+        });
+
+        // Inicialización
+        window.onload = function() {
+            applyTheme();
+            generateParticles();
+            renderError();
+        };
+    </script>
+</body>
+</html>
