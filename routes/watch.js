@@ -68,7 +68,7 @@ router.get('/:id', async (req, res) => {
       <meta name="twitter:player:height" content="720">
     `;
 
-    html = html.replace('<title></title>', head);
+    html = html.replace('<title>PlayTube</title>', head);
 
     const initialData = {
       video: {
