@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
     <meta name="twitter:card" content="summary_large_image">
   `;
   
-  html = html.replace('<title></title>', head);
+  html = html.replace('<title>andresvpn</title>', head);
   res.send(html);
 });
 
