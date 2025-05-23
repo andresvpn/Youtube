@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Reproductor de videos minimalista con diseño moderno">
+    <meta name="keywords" content="videos, reproductor, youtube, playtube">
+    <meta name="author" content="PlayTube">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= currentUrl %>">
+    <meta property="og:title" content="<%= title %>">
+    <meta property="og:description" content="Reproductor de videos minimalista con diseño moderno">
+    <meta property="og:image" content="<%= shareImage %>">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="<%= currentUrl %>">
+    <meta property="twitter:title" content="<%= title %>">
+    <meta property="twitter:description" content="Reproductor de videos minimalista con diseño moderno">
+    <meta property="twitter:image" content="<%= shareImage %>">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22<%= primaryColor %>%22>▶</text></svg>">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <a href="/" class="logo">
+                <i class="fas fa-play"></i>
+                <span><%= siteName %></span>
+            </a>
+            
+            <div class="search-container">
+                <form action="/" method="get">
+                    <input type="text" class="search-input" name="q" placeholder="Buscar videos..." value="<%= query %>">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main class="main-content">
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <div class="videos-grid">
+            <% videos.forEach(video => { %>
+                <a href="/watch?v=<%= video.videoId %>" class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="<%= video.thumbnail %>" alt="<%= video.title %>" loading="lazy">
+                        <div class="video-duration"><%= video.timestamp %></div>
+                    </div>
+                    <div class="video-card-info">
+                        <h3><%= video.title %></h3>
+                        <p><%= video.author.name %></p>
+                        <p><%= video.views %> vistas • <%= video.ago %></p>
+                    </div>
+                </a>
+            <% }); %>
+        </div>
+        
+        <% if (videos.length === 0 && !error) { %>
+            <div class="no-results">
+                No se encontraron videos. Intenta con otra búsqueda.
+            </div>
+        <% } %>
+    </main>
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
