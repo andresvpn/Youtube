@@ -14,7 +14,6 @@ app.use('/', require('./routes/home'));
 app.use('/watch', require('./routes/watch'));
 app.use('/api', require('./routes/api'));
 app.use('/search', require('./routes/search'));
-app.use("/channel", require('./routes/channel'))
 
 // Manejo de errores
 app.use((req, res) => {
