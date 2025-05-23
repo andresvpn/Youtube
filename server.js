@@ -23,7 +23,7 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).send('Algo salió mal!');
+  res.status(500).sendFile(path.join(__dirname, 'public', '500.html'));
 });
 
 module.exports = app;
