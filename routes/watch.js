@@ -3,7 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const yts = require('yt-search');
-const config = require("../src/config")
+const config = require("./config")
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
