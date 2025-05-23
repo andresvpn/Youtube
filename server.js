@@ -3,7 +3,9 @@ const path = require('path');
 const app = express();
 
 // Configuración básica
-app.use(express.static(path.join(__dirname, 'public')));
+
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
