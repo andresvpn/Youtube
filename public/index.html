@@ -746,403 +746,85 @@
     </div>
     
     <script>
-      // DOM elements (MANTENIENDO TODOS LOS NOMBRES ORIGINALES)
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const videosGrid = document.getElementById('videos-grid');
-const loader = document.getElementById('loader');
-const noResults = document.getElementById('no-results');
-const videoPlayerContainer = document.getElementById('video-player-container');
-const videoIframe = document.getElementById('video-iframe');
-const videoTitle = document.getElementById('video-title');
-const videoViews = document.getElementById('video-views');
-const videoDate = document.getElementById('video-date');
-const videoDuration = document.getElementById('video-duration');
-const authorAvatar = document.getElementById('author-avatar');
-const authorName = document.getElementById('author-name');
-const backButton = document.getElementById('back-button');
-const suggestedVideos = document.getElementById('suggested-videos');
-const suggestedGrid = document.getElementById('suggested-grid');
-const shareButton = document.getElementById('share-button');
-const shareModal = document.getElementById('share-modal');
-const closeShare = document.getElementById('close-share');
-const shareLink = document.getElementById('share-link');
-const copyButton = document.getElementById('copy-button');
-const facebookShare = document.getElementById('facebook-share');
-const twitterShare = document.getElementById('twitter-share');
-const whatsappShare = document.getElementById('whatsapp-share');
-const homeLink = document.getElementById('home-link');
+     // ========== 1. REPRODUCCIÓN AUTOMÁTICA (Añade esto al final de tu script) ==========
 
-// NUEVAS VARIABLES PARA LAS MEJORAS (sin afectar las existentes)
-let nextPageToken = '';
-let isFetchingMore = false;
-let hasMoreResults = true;
-
-// 1. MEJORA: PAGINACIÓN INFINITA (se añade al final del script existente)
-window.addEventListener('scroll', () => {
-    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-    
-    if (scrollTop + clientHeight >= scrollHeight - 500 && 
-        !isFetchingMore && 
-        hasMoreResults && 
-        currentSearchTerm && 
-        videoPlayerContainer.style.display !== 'block') {
-        
-        loadMoreVideos();
-    }
-});
-
-async function loadMoreVideos() {
-    isFetchingMore = true;
-    loader.style.display = 'flex';
-    
-    try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(currentSearchTerm)}&pageToken=${nextPageToken}`);
-        const data = await response.json();
-        
-        if (data.status && data.data && data.data.length > 0) {
-            searchResults = [...searchResults, ...data.data];
-            displayVideos(data.data, videosGrid);
-            nextPageToken = data.nextPageToken || '';
-            hasMoreResults = !!data.nextPageToken;
-        } else {
-            hasMoreResults = false;
-        }
-    } catch (error) {
-        console.error('Error loading more videos:', error);
-    } finally {
-        isFetchingMore = false;
-        loader.style.display = 'none';
+// Función para cargar la API de YouTube
+function loadYouTubeAPI() {
+    if (!window.YT) {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 }
 
-// 2. MEJORA: AUTOPLAY SIGUIENTE VIDEO (se modifica solo la función playVideo)
+// Modifica TU FUNCIÓN playVideo (solo cambia la línea del embedUrl):
 function playVideo(video) {
     currentVideoId = video.videoId;
     currentVideoData = video;
     currentVideoUrl = `${window.location.origin}/watch/${video.videoId}`;
     
-    // Modificado para soportar autoplay del siguiente video
+    // CAMBIA ESTA LÍNEA (añade enablejsapi=1):
     const embedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0&enablejsapi=1`;
     
     if (videoIframe.src !== embedUrl) {
         videoIframe.src = embedUrl;
-        
-        // Cargar YouTube API si no está cargada
-        if (!window.YT) {
-            const tag = document.createElement('script');
-            tag.src = "https://www.youtube.com/iframe_api";
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        }
-        
-        // Configurar el reproductor
-        window.onYouTubeIframeAPIReady = function() {
-            new YT.Player(videoIframe, {
-                events: {
-                    'onStateChange': function(event) {
-                        if (event.data === YT.PlayerState.ENDED) {
-                            playNextSuggestedVideo();
-                        }
-                    }
-                }
-            });
-        };
+        loadYouTubeAPI(); // Cargar la API si no está
     }
     
-    // Resto de la función ORIGINAL (sin cambios)
-    videoPlayerContainer.style.display = 'block';
-    videosGrid.style.display = 'none';
-    backButton.style.display = 'flex';
-    noResults.style.display = 'none';
-    
-    videoTitle.textContent = video.title || 'Título no disponible';
-    videoViews.textContent = video.views ? formatNumber(video.views) + ' visualizaciones' : 'Visualizaciones no disponibles';
-    videoDate.textContent = video.ago ? '• ' + video.ago : '';
-    
-    const duration = video.duration?.timestamp || video.timestamp || '';
-    videoDuration.textContent = duration ? '• ' + duration : '';
-    
-    const author = video.author?.name || 'Canal desconocido';
-    authorName.textContent = author;
-    authorAvatar.textContent = getInitials(author);
-    
-    window.history.pushState({ videoId: video.videoId }, '', `/watch/${video.videoId}`);
-    searchVideos(video.title.split(' ').slice(0, 3).join(' '), true);
-    videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
+    // ... EL RESTO DE TU FUNCIÓN playVideo PERMANECE IGUAL ...
 }
 
-// Función NUEVA para reproducir el siguiente video sugerido
+// Añade estas funciones nuevas:
+window.onYouTubeIframeAPIReady = function() {
+    // Se llama automáticamente cuando la API de YouTube está lista
+};
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.ENDED) {
+        playNextSuggestedVideo();
+    }
+}
+
 function playNextSuggestedVideo() {
-    const suggestedVideos = suggestedGrid.querySelectorAll('.video-card');
-    if (suggestedVideos.length > 0) {
-        const nextVideoCard = suggestedVideos[0];
-        const videoId = nextVideoCard.dataset.videoId;
-        
-        // Buscar el video en los resultados
-        const videoData = searchResults.find(v => v.videoId === videoId) || 
-                         currentVideoData?.suggestedVideos?.find(v => v.videoId === videoId);
-        
-        if (videoData) {
-            playVideo(videoData);
-        }
+    const firstSuggested = suggestedGrid.querySelector('.video-card');
+    if (firstSuggested) {
+        firstSuggested.click(); // Simula click en el primer sugerido
     }
 }
 
-// RESTO DEL SCRIPT ORIGINAL (sin modificaciones)
-function formatNumber(num) {
-    if (!num) return 'N/A';
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-}
+// ========== 2. SCROLL INFINITO (Añade esto al final) ==========
+let isFetching = false;
 
-function getInitials(name) {
-    if (!name) return '';
-    return name.split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2);
-}
+window.addEventListener('scroll', () => {
+    if (isFetching || !currentSearchTerm || videoPlayerContainer.style.display === 'block') return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+    if (scrollTop + clientHeight > scrollHeight - 500) {
+        loadMoreVideos();
+    }
+});
 
-async function searchVideos(query, showSuggestions = false) {
-    if (!query) return;
+async function loadMoreVideos() {
+    isFetching = true;
+    loader.style.display = 'flex';
     
     try {
-        if (!showSuggestions) {
-            loader.style.display = 'flex';
-            noResults.style.display = 'none';
-            videosGrid.innerHTML = '';
-            nextPageToken = '';
-            hasMoreResults = true;
-        }
-        
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        // Usa TU MISMO ENDPOINT (sin pageToken)
+        const response = await fetch(`/api/search?q=${encodeURIComponent(currentSearchTerm)}`);
         const data = await response.json();
         
-        if (data.status && data.data && data.data.length > 0) {
-            if (showSuggestions) {
-                displayVideos(data.data, suggestedGrid);
-            } else {
-                searchResults = data.data;
-                displayVideos(data.data, videosGrid);
-                currentSearchTerm = query;
-                nextPageToken = data.nextPageToken || '';
-                
-                const newUrl = `/search?q=${encodeURIComponent(query)}`;
-                window.history.pushState({ path: newUrl }, '', newUrl);
-            }
-        } else if (!showSuggestions) {
-            noResults.style.display = 'block';
+        if (data.status && data.data) {
+            searchResults = [...searchResults, ...data.data];
+            displayVideos(data.data, videosGrid);
         }
     } catch (error) {
-        console.error('Error searching videos:', error);
-        if (!showSuggestions) {
-            noResults.textContent = 'Error al cargar los videos. Intenta nuevamente.';
-            noResults.style.display = 'block';
-        }
+        console.error('Error al cargar más videos:', error);
     } finally {
-        if (!showSuggestions) {
-            loader.style.display = 'none';
-        }
+        isFetching = false;
+        loader.style.display = 'none';
     }
-}
-
-function displayVideos(videos, gridElement) {
-    gridElement.innerHTML = '';
-    
-    videos.forEach(video => {
-        if (video.videoId === currentVideoId) return;
-        
-        const duration = video.duration?.timestamp || video.timestamp || '';
-        
-        const videoCard = document.createElement('div');
-        videoCard.className = 'video-card';
-        videoCard.dataset.videoId = video.videoId; // Añadido para el autoplay
-        videoCard.innerHTML = `
-            <div class="video-thumbnail">
-                <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
-                ${duration ? `<div class="video-duration">${duration}</div>` : ''}
-            </div>
-            <div class="video-card-info">
-                <h3>${video.title}</h3>
-                <p>${video.author?.name || 'Canal desconocido'}</p>
-                <p>${video.views ? formatNumber(video.views) + ' vistas' : ''} ${video.ago ? '• ' + video.ago : ''}</p>
-            </div>
-        `;
-        
-        videoCard.addEventListener('click', () => playVideo(video));
-        gridElement.appendChild(videoCard);
-    });
-}
-
-function backToResults() {
-    videoPlayerContainer.style.display = 'none';
-    videosGrid.style.display = 'grid';
-    backButton.style.display = 'none';
-    
-    if (searchResults.length > 0) {
-        displayVideos(searchResults, videosGrid);
-    }
-    
-    const newUrl = currentSearchTerm ? 
-        `/search?q=${encodeURIComponent(currentSearchTerm)}` : 
-        '/';
-    window.history.pushState({}, '', newUrl);
-    
-    videosGrid.scrollIntoView({ behavior: 'smooth' });
-}
-
-function openShareModal() {
-    shareLink.value = currentVideoUrl;
-    
-    const encodedUrl = encodeURIComponent(currentVideoUrl);
-    const encodedTitle = encodeURIComponent(videoTitle.textContent);
-    
-    facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-    twitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-    whatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A%0A${encodedUrl}`;
-    
-    shareModal.style.display = 'flex';
-}
-
-function closeShareModal() {
-    shareModal.style.display = 'none';
-}
-
-function copyShareLink() {
-    shareLink.select();
-    document.execCommand('copy');
-    
-    const originalText = copyButton.textContent;
-    copyButton.textContent = 'Copiado!';
-    
-    setTimeout(() => {
-        copyButton.textContent = originalText;
-    }, 2000);
-}
-
-function handleInitialLoad() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = window.location.pathname.startsWith('/watch/') ? 
-        window.location.pathname.split('/watch/')[1].split('/')[0] : null;
-    const searchQuery = urlParams.get('q');
-    
-    if (videoId) {
-        const videoData = {
-            videoId: videoId,
-            title: 'Video cargado desde URL',
-            views: 0,
-            ago: '',
-            author: { name: 'Cargando...' },
-            thumbnail: '',
-            duration: { timestamp: '0:00' }
-        };
-        playVideo(videoData);
-        
-        fetch(`/api/video/${videoId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status && data.data) {
-                    playVideo(data.data);
-                }
-            });
-    } else if (window.location.pathname.startsWith('/search') && searchQuery) {
-        searchInput.value = searchQuery;
-        searchVideos(searchQuery);
-    } else {
-        const frases = [
-            "cosas que no sabías hace 5 minutos",
-            "te lo resumí",
-            "videos más virales",
-            "datos curiosos",
-            "top 10 del mundo",
-            "sabías que",
-            "video resumen",
-            "lo más visto hoy",
-            "resumen rápido"
-        ];
-        const random = frases[Math.floor(Math.random() * frases.length)];
-        searchVideos(random);
-    }
-}
-
-// Event listeners ORIGINALES (sin cambios)
-searchButton.addEventListener('click', () => {
-    const query = searchInput.value.trim();
-    if (query) {
-        searchVideos(query);
-        if (videoPlayerContainer.style.display === 'block') {
-            backToResults();
-        }
-    }
-});
-
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        const query = searchInput.value.trim();
-        if (query) {
-            searchVideos(query);
-            if (videoPlayerContainer.style.display === 'block') {
-                backToResults();
-            }
-        }
-    }
-});
-
-backButton.addEventListener('click', backToResults);
-shareButton.addEventListener('click', openShareModal);
-closeShare.addEventListener('click', closeShareModal);
-copyButton.addEventListener('click', copyShareLink);
-homeLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    backToResults();
-    window.history.pushState({}, '', '/');
-});
-
-window.addEventListener('popstate', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = window.location.pathname.startsWith('/watch/') ? 
-        window.location.pathname.split('/watch/')[1].split('/')[0] : null;
-    const searchQuery = urlParams.get('q');
-    
-    if (videoId) {
-        fetch(`/api/video/${videoId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status && data.data) {
-                    playVideo(data.data);
-                }
-            });
-    } else if (window.location.pathname.startsWith('/search') && searchQuery) {
-        searchInput.value = searchQuery;
-        searchVideos(searchQuery);
-        backToResults();
-    } else {
-        const frases = [
-            "cosas que no sabías hace 5 minutos",
-            "te lo resumí",
-            "videos más virales",
-            "datos curiosos",
-            "top 10 del mundo",
-            "sabías que",
-            "video resumen",
-            "lo más visto hoy",
-            "resumen rápido"
-        ];
-        const random = frases[Math.floor(Math.random() * frases.length)];
-        searchVideos(random);
-        backToResults();
-    }
-});
-
-// Inicialización ORIGINAL
-handleInitialLoad(); 
+} 
     </script>
 </body>
 </html>
