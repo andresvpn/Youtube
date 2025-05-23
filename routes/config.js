@@ -1,5 +1,6 @@
 const config = {
   title: "PlayTube",
-  logo ""
-}
-module.exports = config
+  logo: "#"
+};
+module.exports = config;
+
