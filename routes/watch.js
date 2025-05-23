@@ -11,7 +11,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     if (!id || id.length < 11) {
-      return res.status(400).send('ID de video inválido');
+      return res.status(400).sendFile(path.join(__dirname, '..', 'public', '400.html')); 
     }
 
     let searchResults;
@@ -20,11 +20,11 @@ router.get('/:id', async (req, res) => {
       searchResults = result.videos.find(v => v.videoId === id);
     } catch (error) {
       console.error('Error en yt-search:', error);
-      return res.status(502).send('Error al conectar con el servicio de búsqueda');
+      return res.status(502).sendFile(path.join(__dirname, '..', 'public', '502.html')); 
     }
 
     if (!searchResults) {
-      return res.status(404).send('Video no encontrado');
+      return res.status(404).sendFile(path.join(__dirname, '..', 'public', '504.html')); 
     }
 
     const video = searchResults;
