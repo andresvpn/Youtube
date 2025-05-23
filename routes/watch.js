@@ -35,7 +35,7 @@ router.get('/:id', async (req, res) => {
       html = fs.readFileSync(htmlPath, 'utf8');
     } catch (error) {
       console.error('Error al leer el archivo HTML:', error);
-      return res.status(500).send('Error interno del servidor');
+      return res.status(500).sendFile(path.join(__dirname, '..', 'public', '500.html')); 
     }
 
     const seo = {
@@ -103,7 +103,11 @@ router.get('/:id', async (req, res) => {
     res.send(html);
   } catch (error) {
     console.error('Error inesperado:', error);
-    res.status(500).send('Error interno al cargar el video');
+   // Error 404
+res.status(404).sendFile(path.join(__dirname, '..', 'public', '404.html'));
+
+// Error 500
+res.status(500).sendFile(path.join(__dirname, '..', 'public', '500.html')); 
   }
 });
 
@@ -111,12 +115,12 @@ router.get('/:id/embed', (req, res) => {
   try {
     const videoId = req.params.id;
     if (!videoId || videoId.length < 11) {
-      return res.status(400).send('ID de video inválido');
+      return res.status(400).sendFile(path.join(__dirname, '..', 'public', '404.html')); 
     }
     res.redirect(`/watch/${videoId}?_embed=true`);
   } catch (error) {
     console.error('Error en embed:', error);
-    res.status(500).send('Error interno');
+    res.status(500).sendFile(path.join(__dirname, '..', 'public', '500.html')); 
   }
 });
 
