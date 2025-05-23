@@ -29,6 +29,7 @@ router.get('/', (req, res) => {
   `;
   
   html = html.replace('<title></title>', head);
+  html = html.replace('<span id="dinamic_title"></span>', `<span id="dinamic_title">${config.title}</span>`);
   res.send(html);
 });
 
