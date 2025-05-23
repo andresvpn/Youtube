@@ -746,343 +746,353 @@
     </div>
     
     <script>
-// ===== [TODOS TUS ELEMENTOS ORIGINALES] =====
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-const videosGrid = document.getElementById('videos-grid');
-const loader = document.getElementById('loader');
-const noResults = document.getElementById('no-results');
-const videoPlayerContainer = document.getElementById('video-player-container');
-const videoIframe = document.getElementById('video-iframe');
-const videoTitle = document.getElementById('video-title');
-const videoViews = document.getElementById('video-views');
-const videoDate = document.getElementById('video-date');
-const videoDuration = document.getElementById('video-duration');
-const authorAvatar = document.getElementById('author-avatar');
-const authorName = document.getElementById('author-name');
-const backButton = document.getElementById('back-button');
-const suggestedVideos = document.getElementById('suggested-videos');
-const suggestedGrid = document.getElementById('suggested-grid');
-const shareButton = document.getElementById('share-button');
-const shareModal = document.getElementById('share-modal');
-const closeShare = document.getElementById('close-share');
-const shareLink = document.getElementById('share-link');
-const copyButton = document.getElementById('copy-button');
-const facebookShare = document.getElementById('facebook-share');
-const twitterShare = document.getElementById('twitter-share');
-const whatsappShare = document.getElementById('whatsapp-share');
-const homeLink = document.getElementById('home-link');
-
-// ===== [TUS VARIABLES ORIGINALES] =====
-let currentSearchTerm = '';
-let currentVideoId = '';
-let currentVideoUrl = '';
-let currentVideoData = null;
-let searchResults = [];
-
-// ===== [NUEVO: CONTROLADOR DE YOUTUBE API] =====
-let youtubePlayer;
-
-function initYouTubePlayer() {
-    youtubePlayer = new YT.Player(videoIframe, {
-        events: {
-            'onStateChange': (event) => {
-                if (event.data === YT.PlayerState.ENDED) {
-                    playNextVideo();
+        // DOM elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const videosGrid = document.getElementById('videos-grid');
+        const loader = document.getElementById('loader');
+        const noResults = document.getElementById('no-results');
+        const videoPlayerContainer = document.getElementById('video-player-container');
+        const videoIframe = document.getElementById('video-iframe');
+        const videoTitle = document.getElementById('video-title');
+        const videoViews = document.getElementById('video-views');
+        const videoDate = document.getElementById('video-date');
+        const videoDuration = document.getElementById('video-duration');
+        const authorAvatar = document.getElementById('author-avatar');
+        const authorName = document.getElementById('author-name');
+        const backButton = document.getElementById('back-button');
+        const suggestedVideos = document.getElementById('suggested-videos');
+        const suggestedGrid = document.getElementById('suggested-grid');
+        const shareButton = document.getElementById('share-button');
+        const shareModal = document.getElementById('share-modal');
+        const closeShare = document.getElementById('close-share');
+        const shareLink = document.getElementById('share-link');
+        const copyButton = document.getElementById('copy-button');
+        const facebookShare = document.getElementById('facebook-share');
+        const twitterShare = document.getElementById('twitter-share');
+        const whatsappShare = document.getElementById('whatsapp-share');
+        const homeLink = document.getElementById('home-link');
+        
+        // State variables
+        let currentSearchTerm = '';
+        let currentVideoId = '';
+        let currentVideoUrl = '';
+        let currentVideoData = null;
+        let searchResults = [];
+        
+        // Format numbers (1,000,000 -> 1M)
+        function formatNumber(num) {
+            if (!num) return 'N/A';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        // Get channel initials
+        function getInitials(name) {
+            if (!name) return '';
+            return name.split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+        }
+        
+        // Search videos
+        async function searchVideos(query, showSuggestions = false) {
+            if (!query) return;
+            
+            try {
+                if (!showSuggestions) {
+                    loader.style.display = 'flex';
+                    noResults.style.display = 'none';
+                    videosGrid.innerHTML = '';
+                }
+                
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.status && data.data && data.data.length > 0) {
+                    if (showSuggestions) {
+                        displayVideos(data.data, suggestedGrid);
+                    } else {
+                        searchResults = data.data; // Guardar los resultados para poder volver
+                        displayVideos(data.data, videosGrid);
+                        currentSearchTerm = query;
+                        
+                        // Update URL without reload
+                        const newUrl = `/search?q=${encodeURIComponent(query)}`;
+                        window.history.pushState({ path: newUrl }, '', newUrl);
+                    }
+                } else if (!showSuggestions) {
+                    noResults.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error searching videos:', error);
+                if (!showSuggestions) {
+                    noResults.textContent = 'Error al cargar los videos. Intenta nuevamente.';
+                    noResults.style.display = 'block';
+                }
+            } finally {
+                if (!showSuggestions) {
+                    loader.style.display = 'none';
                 }
             }
         }
-    });
-}
-
-// Cargar YouTube API dinámicamente (solo si no está cargada)
-if (!window.YT) {
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-    window.onYouTubeIframeAPIReady = () => {
-        initYouTubePlayer();
-    };
-}
-
-// ===== [TU FUNCIÓN playVideo MEJORADA] =====
-function playVideo(video) {
-    currentVideoId = video.videoId;
-    currentVideoData = video;
-    currentVideoUrl = `${window.location.origin}/watch/${video.videoId}`;
-
-    // Modificado para soportar autoplay del siguiente video
-    const embedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&enablejsapi=1&rel=0`;
-    
-    if (videoIframe.src !== embedUrl) {
-        videoIframe.src = embedUrl;
-    }
-
-    // Resto de tu función original (sin cambios)
-    videoPlayerContainer.style.display = 'block';
-    videosGrid.style.display = 'none';
-    backButton.style.display = 'flex';
-    noResults.style.display = 'none';
-
-    videoTitle.textContent = video.title || 'Título no disponible';
-    videoViews.textContent = video.views ? formatNumber(video.views) + ' visualizaciones' : 'Visualizaciones no disponibles';
-    videoDate.textContent = video.ago ? '• ' + video.ago : '';
-    
-    const duration = video.duration?.timestamp || video.timestamp || '';
-    videoDuration.textContent = duration ? '• ' + duration : '';
-
-    const author = video.author?.name || 'Canal desconocido';
-    authorName.textContent = author;
-    authorAvatar.textContent = getInitials(author);
-
-    window.history.pushState({ videoId: video.videoId }, '', `/watch/${video.videoId}`);
-    searchVideos(video.title.split(' ').slice(0, 3).join(' '), true);
-}
-
-// ===== [NUEVA FUNCIÓN: playNextVideo] =====
-function playNextVideo() {
-    const suggestedCards = suggestedGrid.querySelectorAll('.video-card');
-    if (suggestedCards.length > 0) {
-        // Simular click en el primer video sugerido
-        suggestedCards[0].click();
-    }
-}
-
-// ===== [TODAS TUS FUNCIONES ORIGINALES (SIN CAMBIOS)] =====
-function formatNumber(num) {
-    if (!num) return 'N/A';
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(1) + 'M';
-    }
-    if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
-}
-
-function getInitials(name) {
-    if (!name) return '';
-    return name.split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .substring(0, 2);
-}
-
-async function searchVideos(query, showSuggestions = false) {
-    if (!query) return;
-    
-    try {
-        if (!showSuggestions) {
-            loader.style.display = 'flex';
-            noResults.style.display = 'none';
-            videosGrid.innerHTML = '';
-        }
         
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-        const data = await response.json();
-        
-        if (data.status && data.data && data.data.length > 0) {
-            if (showSuggestions) {
-                displayVideos(data.data, suggestedGrid);
-            } else {
-                searchResults = data.data;
-                displayVideos(data.data, videosGrid);
-                currentSearchTerm = query;
-                window.history.pushState({ path: `/search?q=${query}` }, '', `/search?q=${query}`);
-            }
-        } else if (!showSuggestions) {
-            noResults.style.display = 'block';
-        }
-    } catch (error) {
-        console.error('Error searching videos:', error);
-        if (!showSuggestions) {
-            noResults.textContent = 'Error al cargar los videos. Intenta nuevamente.';
-            noResults.style.display = 'block';
-        }
-    } finally {
-        if (!showSuggestions) {
-            loader.style.display = 'none';
-        }
-    }
-}
-
-function displayVideos(videos, gridElement) {
-    gridElement.innerHTML = '';
-    
-    videos.forEach(video => {
-        if (video.videoId === currentVideoId) return;
-        
-        const duration = video.duration?.timestamp || video.timestamp || '';
-        
-        const videoCard = document.createElement('div');
-        videoCard.className = 'video-card';
-        videoCard.innerHTML = `
-            <div class="video-thumbnail">
-                <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
-                ${duration ? `<div class="video-duration">${duration}</div>` : ''}
-            </div>
-            <div class="video-card-info">
-                <h3>${video.title}</h3>
-                <p>${video.author?.name || 'Canal desconocido'}</p>
-                <p>${video.views ? formatNumber(video.views) + ' vistas' : ''} ${video.ago ? '• ' + video.ago : ''}</p>
-            </div>
-        `;
-        
-        videoCard.addEventListener('click', () => playVideo(video));
-        gridElement.appendChild(videoCard);
-    });
-}
-
-function backToResults() {
-    videoPlayerContainer.style.display = 'none';
-    videosGrid.style.display = 'grid';
-    backButton.style.display = 'none';
-    
-    if (searchResults.length > 0) {
-        displayVideos(searchResults, videosGrid);
-    }
-    
-    window.history.pushState({}, '', currentSearchTerm ? `/search?q=${currentSearchTerm}` : '/');
-}
-
-function openShareModal() {
-    shareLink.value = currentVideoUrl;
-    facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentVideoUrl)}`;
-    twitterShare.href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentVideoUrl)}&text=${encodeURIComponent(videoTitle.textContent)}`;
-    whatsappShare.href = `https://wa.me/?text=${encodeURIComponent(videoTitle.textContent)}%0A%0A${encodeURIComponent(currentVideoUrl)}`;
-    shareModal.style.display = 'flex';
-}
-
-function closeShareModal() {
-    shareModal.style.display = 'none';
-}
-
-function copyShareLink() {
-    shareLink.select();
-    document.execCommand('copy');
-    copyButton.textContent = 'Copiado!';
-    setTimeout(() => { copyButton.textContent = 'Copiar'; }, 2000);
-}
-
-function handleInitialLoad() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = window.location.pathname.startsWith('/watch/') ? 
-        window.location.pathname.split('/watch/')[1].split('/')[0] : null;
-    const searchQuery = urlParams.get('q');
-    
-    if (videoId) {
-        const videoData = {
-            videoId: videoId,
-            title: 'Video cargado desde URL',
-            views: 0,
-            ago: '',
-            author: { name: 'Cargando...' },
-            thumbnail: '',
-            duration: { timestamp: '0:00' }
-        };
-        playVideo(videoData);
-        
-        fetch(`/api/video/${videoId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status && data.data) {
-                    playVideo(data.data);
-                }
+        // Display videos in grid
+        function displayVideos(videos, gridElement) {
+            gridElement.innerHTML = '';
+            
+            videos.forEach(video => {
+                if (video.videoId === currentVideoId) return;
+                
+                const duration = video.duration?.timestamp || video.timestamp || '';
+                
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}" loading="lazy">
+                        ${duration ? `<div class="video-duration">${duration}</div>` : ''}
+                    </div>
+                    <div class="video-card-info">
+                        <h3>${video.title}</h3>
+                        <p>${video.author?.name || 'Canal desconocido'}</p>
+                        <p>${video.views ? formatNumber(video.views) + ' vistas' : ''} ${video.ago ? '• ' + video.ago : ''}</p>
+                    </div>
+                `;
+                
+                videoCard.addEventListener('click', () => playVideo(video));
+                gridElement.appendChild(videoCard);
             });
-    } else if (window.location.pathname.startsWith('/search') && searchQuery) {
-        searchInput.value = searchQuery;
-        searchVideos(searchQuery);
-    } else {
-        const frases = [
-            "cosas que no sabías hace 5 minutos",
-            "te lo resumí",
-            "videos más virales",
-            "datos curiosos",
-            "top 10 del mundo",
-            "sabías que",
-            "video resumen",
-            "lo más visto hoy",
-            "resumen rápido"
-        ];
-        const random = frases[Math.floor(Math.random() * frases.length)];
-        searchVideos(random);
-    }
-}
-
-// ===== [TUS EVENT LISTENERS ORIGINALES] =====
-searchButton.addEventListener('click', () => {
-    const query = searchInput.value.trim();
-    if (query) {
-        searchVideos(query);
-        if (videoPlayerContainer.style.display === 'block') {
-            backToResults();
         }
-    }
-});
+        
+        // Play video
+        function playVideo(video) {
+            currentVideoId = video.videoId;
+            currentVideoData = video;
+            currentVideoUrl = `${window.location.origin}/watch/${video.videoId}`;
+            
+            const embedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
+            
+            // Set iframe source
+            if (videoIframe.src !== embedUrl) {
+                videoIframe.src = embedUrl;
+            }
+            
+            // Show player and hide grid
+            videoPlayerContainer.style.display = 'block';
+            videosGrid.style.display = 'none';
+            backButton.style.display = 'flex';
+            
+            noResults.style.display = 'none';
+            
+            // Update video info
+            videoTitle.textContent = video.title || 'Título no disponible';
+            videoViews.textContent = video.views ? formatNumber(video.views) + ' visualizaciones' : 'Visualizaciones no disponibles';
+            videoDate.textContent = video.ago ? '• ' + video.ago : '';
+            
+            // Mostrar la duración correctamente
+            const duration = video.duration?.timestamp || video.timestamp || '';
+            videoDuration.textContent = duration ? '• ' + duration : '';
+            
+            const author = video.author?.name || 'Canal desconocido';
+            authorName.textContent = author;
+            authorAvatar.textContent = getInitials(author);
+            
+            // Update URL with video ID
+            window.history.pushState({ videoId: video.videoId }, '', `/watch/${video.videoId}`);
+            
+            // Load suggested videos
+            searchVideos(video.title.split(' ').slice(0, 3).join(' '), true);
+            
+            videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Back to results
+        function backToResults() {
+            videoPlayerContainer.style.display = 'none';
+            videosGrid.style.display = 'grid';
+            backButton.style.display = 'none';
+            
+            // Restore previous search results if available
+            if (searchResults.length > 0) {
+                displayVideos(searchResults, videosGrid);
+            }
+            
+            // Update URL with search query or home
+            const newUrl = currentSearchTerm ? 
+                `/search?q=${encodeURIComponent(currentSearchTerm)}` : 
+                '/';
+            window.history.pushState({}, '', newUrl);
+            
+            videosGrid.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Open share modal
+        function openShareModal() {
+            shareLink.value = currentVideoUrl;
+            
+            // Set social share links
+            const encodedUrl = encodeURIComponent(currentVideoUrl);
+            const encodedTitle = encodeURIComponent(videoTitle.textContent);
+            
+            facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+            twitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+            whatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A%0A${encodedUrl}`;
+            
+            shareModal.style.display = 'flex';
+        }
+        
+        // Close share modal
+        function closeShareModal() {
+            shareModal.style.display = 'none';
+        }
+        
+        // Copy share link
+        function copyShareLink() {
+            shareLink.select();
+            document.execCommand('copy');
+            
+            const originalText = copyButton.textContent;
+            copyButton.textContent = 'Copiado!';
+            
+            setTimeout(() => {
+                copyButton.textContent = originalText;
+            }, 2000);
+        }
+        
+        // Handle URL parameters on load
+        function handleInitialLoad() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = window.location.pathname.startsWith('/watch/') ? 
+                window.location.pathname.split('/watch/')[1].split('/')[0] : null;
+            const searchQuery = urlParams.get('q');
+            
+            if (videoId) {
+                // Load video directly if ID is in URL
+                const videoData = {
+                    videoId: videoId,
+                    title: 'Video cargado desde URL',
+                    views: 0,
+                    ago: '',
+                    author: { name: 'Cargando...' },
+                    thumbnail: '',
+                    duration: { timestamp: '0:00' }
+                };
+                playVideo(videoData);
+                
+                // Fetch actual video data
+                fetch(`/api/video/${videoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status && data.data) {
+                            playVideo(data.data);
+                        }
+                    });
+            } else if (window.location.pathname.startsWith('/search') && searchQuery) {
+                // Perform search if query is in URL
+                searchInput.value = searchQuery;
+                searchVideos(searchQuery);
+            } else {
+                // Default search
+                const frases = [
+                    "cosas que no sabías hace 5 minutos",
+                    "te lo resumí",
+                    "videos más virales",
+                    "datos curiosos",
+                    "top 10 del mundo",
+                    "sabías que",
+                    "video resumen",
+                    "lo más visto hoy",
+                    "resumen rápido"
+                ];
 
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        const query = searchInput.value.trim();
-        if (query) {
-            searchVideos(query);
-            if (videoPlayerContainer.style.display === 'block') {
+                // Elegir una frase al azar
+                const random = frases[Math.floor(Math.random() * frases.length)];
+
+                // Llamar a tu función con esa frase
+                searchVideos(random);
+            }
+        }
+        
+        // Event listeners
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchVideos(query);
+                if (videoPlayerContainer.style.display === 'block') {
+                    backToResults();
+                }
+            }
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchVideos(query);
+                    if (videoPlayerContainer.style.display === 'block') {
+                        backToResults();
+                    }
+                }
+            }
+        });
+        
+        backButton.addEventListener('click', backToResults);
+        shareButton.addEventListener('click', openShareModal);
+        closeShare.addEventListener('click', closeShareModal);
+        copyButton.addEventListener('click', copyShareLink);
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            backToResults();
+            window.history.pushState({}, '', '/');
+        });
+        
+        // Handle back/forward navigation
+        window.addEventListener('popstate', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoId = window.location.pathname.startsWith('/watch/') ? 
+                window.location.pathname.split('/watch/')[1].split('/')[0] : null;
+            const searchQuery = urlParams.get('q');
+            
+            if (videoId) {
+                fetch(`/api/video/${videoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status && data.data) {
+                            playVideo(data.data);
+                        }
+                    });
+            } else if (window.location.pathname.startsWith('/search') && searchQuery) {
+                searchInput.value = searchQuery;
+                searchVideos(searchQuery);
+                backToResults();
+            } else {
+                const frases = [
+                    "cosas que no sabías hace 5 minutos",
+                    "te lo resumí",
+                    "videos más virales",
+                    "datos curiosos",
+                    "top 10 del mundo",
+                    "sabías que",
+                    "video resumen",
+                    "lo más visto hoy",
+                    "resumen rápido"
+                ];
+                const random = frases[Math.floor(Math.random() * frases.length)];
+                searchVideos(random);
                 backToResults();
             }
-        }
-    }
-});
-
-backButton.addEventListener('click', backToResults);
-shareButton.addEventListener('click', openShareModal);
-closeShare.addEventListener('click', closeShareModal);
-copyButton.addEventListener('click', copyShareLink);
-homeLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    backToResults();
-    window.history.pushState({}, '', '/');
-});
-
-window.addEventListener('popstate', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = window.location.pathname.startsWith('/watch/') ? 
-        window.location.pathname.split('/watch/')[1].split('/')[0] : null;
-    const searchQuery = urlParams.get('q');
-    
-    if (videoId) {
-        fetch(`/api/video/${videoId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.status && data.data) {
-                    playVideo(data.data);
-                }
-            });
-    } else if (window.location.pathname.startsWith('/search') && searchQuery) {
-        searchInput.value = searchQuery;
-        searchVideos(searchQuery);
-        backToResults();
-    } else {
-        const frases = [
-            "cosas que no sabías hace 5 minutos",
-            "te lo resumí",
-            "videos más virales",
-            "datos curiosos",
-            "top 10 del mundo",
-            "sabías que",
-            "video resumen",
-            "lo más visto hoy",
-            "resumen rápido"
-        ];
-        const random = frases[Math.floor(Math.random() * frases.length)];
-        searchVideos(random);
-        backToResults();
-    }
-});
-
-// ===== [INICIALIZACIÓN ORIGINAL] =====
-handleInitialLoad();
+        });
+        
+        // Initial load
+        handleInitialLoad();
     </script>
 </body>
-</html>
+</html> 
