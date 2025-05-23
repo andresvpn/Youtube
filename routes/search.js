@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const config = require("../src/config")
 
 router.get('/', (req, res) => {
   const { q } = req.query;
@@ -14,8 +15,8 @@ router.get('/', (req, res) => {
   
   // SEO para página de búsqueda
   const seo = {
-    title: `Buscar: ${q} - PlayTube`,
-    description: `Resultados de búsqueda para ${q} en PlayTube`,
+    title: `Buscar: ${q} - ${config.title}`,
+    description: `Resultados de búsqueda para ${q} en ${config.title}`,
     url: req.protocol + '://' + req.get('host') + req.originalUrl
   };
   
@@ -29,7 +30,7 @@ router.get('/', (req, res) => {
   `;
   
   // Inyectar SEO y datos iniciales para el cliente
-  html = html.replace('<title>PlayTube - Reproductor de Videos</title>', head);
+  html = html.replace('<title></title>', head);
   
   const initialData = `
     <script>
