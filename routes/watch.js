@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const yts = require('yt-search');
+const config = require("../src/config")
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -38,9 +39,9 @@ router.get('/:id', async (req, res) => {
     }
 
     const seo = {
-      title: `${video.title} - PlayTube`,
+      title: `${video.title} - ${config.title}`,
       description: `Video de ${video.author?.name || 'este canal'} - ${video.timestamp || ''}`.trim(),
-      image: video.thumbnail || 'https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+      image: video.thumbnail || config.logo,
       url: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
       embedUrl: `https://www.youtube.com/embed/${video.videoId}`
     };
@@ -67,7 +68,7 @@ router.get('/:id', async (req, res) => {
       <meta name="twitter:player:height" content="720">
     `;
 
-    html = html.replace('<title>PlayTube - Reproductor de Videos</title>', head);
+    html = html.replace('<title></title>', head);
 
     const initialData = {
       video: {
