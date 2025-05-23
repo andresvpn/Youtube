@@ -944,7 +944,7 @@
             
             facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
             twitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-            whatsappShare.href = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
+            whatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A%0A${encodedUrl}`;
             
             shareModal.style.display = 'flex';
         }
