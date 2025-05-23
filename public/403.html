@@ -289,8 +289,8 @@
     <script>
         // Configuración centralizada
         const config = {
-            theme: 'blue', // Tema (blue, red, orange, purple, green)
-            contact: "https://t.me/ANDRES_VPN", // Enlace de contacto (null para ocultar botón)
+            theme: 'green', // Tema (blue, red, orange, purple, green)
+            contact: "/", // Enlace de contacto (null para ocultar botón)
             error: 403 // Código de error (403, 404, 500, 503, etc.)
         };
 
@@ -369,7 +369,7 @@
             
             let buttonHTML = '';
             if (config.contact) {
-                buttonHTML = `<a href="${config.contact}" class="btn">Contactar Soporte</a>`;
+                buttonHTML = `<a href="${config.contact}" class="btn">Volver al inicio</a>`;
             }
             
             container.innerHTML = `
