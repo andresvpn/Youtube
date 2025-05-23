@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -8,8 +8,10 @@
     <meta name="description" content="Disfruta de los mejores videos en PlayTube. Busca, descubre y reproduce contenido de calidad.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <style>
-        :root {
+</head>
+<body>
+ <style>
+     :root {
             --primary: #00C853;
             --primary-dark: #009624;
             --primary-light: #5EFC82;
@@ -277,85 +279,6 @@
         
         .mini-player-btn:hover {
             background: var(--primary);
-        }
-        
-        /* Mini share panel */
-        .mini-share-panel {
-            position: fixed;
-            bottom: 200px;
-            right: 20px;
-            width: 300px;
-            background: var(--dark-light);
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            display: none;
-        }
-        
-        .mini-share-content {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .mini-share-input {
-            width: 100%;
-            padding: 8px 12px;
-            background: var(--dark);
-            border: 1px solid var(--gray-dark);
-            color: var(--light);
-            border-radius: 4px;
-            outline: none;
-        }
-        
-        .mini-copy-button {
-            padding: 8px;
-            background: var(--primary);
-            color: var(--dark);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .mini-copy-button:hover {
-            background: var(--primary-light);
-        }
-        
-        .mini-social-share {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        .mini-social-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .mini-social-btn.facebook {
-            background: #3b5998;
-        }
-        
-        .mini-social-btn.twitter {
-            background: #1da1f2;
-        }
-        
-        .mini-social-btn.whatsapp {
-            background: #25d366;
-        }
-        
-        .mini-social-btn:hover {
-            transform: translateY(-3px);
         }
         
         /* Videos grid */
@@ -642,11 +565,6 @@
                 height: 140px;
             }
             
-            .mini-share-panel {
-                width: 250px;
-                bottom: 180px;
-            }
-            
             .action-button span {
                 display: none;
             }
@@ -682,12 +600,6 @@
                 right: 10px;
             }
             
-            .mini-share-panel {
-                width: 200px;
-                bottom: 130px;
-                right: 10px;
-            }
-            
             .share-content {
                 padding: 1.5rem;
             }
@@ -712,15 +624,8 @@
                 width: 180px;
                 height: 100px;
             }
-            
-            .mini-share-panel {
-                width: 180px;
-                bottom: 120px;
-            }
         }
-    </style>
-</head>
-<body>
+ </style>
     <!-- Header mejorado -->
     <header>
         <div class="header-top">
@@ -772,10 +677,6 @@
                             <i class="fas fa-share-alt"></i>
                             <span>Compartir</span>
                         </button>
-                        <button class="action-button" id="minimize-button">
-                            <i class="fas fa-window-minimize"></i>
-                            <span>Minimizar</span>
-                        </button>
                     </div>
                 </div>
                 
@@ -810,40 +711,6 @@
         <!-- No results -->
         <div class="no-results" id="no-results" style="display: none;">
             No se encontraron videos. Intenta con otra búsqueda.
-        </div>
-    </div>
-    
-    <!-- Mini player -->
-    <div class="mini-player" id="mini-player">
-        <div class="mini-player-controls">
-            <button class="mini-player-btn" id="mini-share-btn">
-                <i class="fas fa-share-alt"></i>
-            </button>
-            <button class="mini-player-btn" id="mini-close-btn">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <iframe id="mini-player-iframe" frameborder="0" allowfullscreen></iframe>
-    </div>
-    
-    <!-- Mini share panel -->
-    <div class="mini-share-panel" id="mini-share-panel">
-        <div class="mini-share-content">
-            <input type="text" class="mini-share-input" id="mini-share-link" readonly>
-            <button class="mini-copy-button" id="mini-copy-button">
-                Copiar
-            </button>
-            <div class="mini-social-share">
-                <a href="#" class="mini-social-btn facebook" id="mini-facebook-share">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="mini-social-btn twitter" id="mini-twitter-share">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="mini-social-btn whatsapp" id="mini-whatsapp-share">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-            </div>
         </div>
     </div>
     
@@ -897,7 +764,6 @@
         const suggestedVideos = document.getElementById('suggested-videos');
         const suggestedGrid = document.getElementById('suggested-grid');
         const shareButton = document.getElementById('share-button');
-        const minimizeButton = document.getElementById('minimize-button');
         const shareModal = document.getElementById('share-modal');
         const closeShare = document.getElementById('close-share');
         const shareLink = document.getElementById('share-link');
@@ -907,25 +773,12 @@
         const whatsappShare = document.getElementById('whatsapp-share');
         const homeLink = document.getElementById('home-link');
         
-        // Mini player elements
-        const miniPlayer = document.getElementById('mini-player');
-        const miniPlayerIframe = document.getElementById('mini-player-iframe');
-        const miniCloseBtn = document.getElementById('mini-close-btn');
-        const miniShareBtn = document.getElementById('mini-share-btn');
-        const miniSharePanel = document.getElementById('mini-share-panel');
-        const miniShareLink = document.getElementById('mini-share-link');
-        const miniCopyButton = document.getElementById('mini-copy-button');
-        const miniFacebookShare = document.getElementById('mini-facebook-share');
-        const miniTwitterShare = document.getElementById('mini-twitter-share');
-        const miniWhatsappShare = document.getElementById('mini-whatsapp-share');
-        
         // State variables
         let currentSearchTerm = '';
         let currentVideoId = '';
         let currentVideoUrl = '';
         let currentVideoData = null;
         let searchResults = [];
-        let videoEndedListener = null;
         
         // Format numbers (1,000,000 -> 1M)
         function formatNumber(num) {
@@ -1032,9 +885,6 @@
                 videoIframe.src = embedUrl;
             }
             
-            // Set mini player iframe source
-            miniPlayerIframe.src = embedUrl;
-            
             // Show player and hide grid
             videoPlayerContainer.style.display = 'block';
             videosGrid.style.display = 'none';
@@ -1062,45 +912,6 @@
             searchVideos(video.title.split(' ').slice(0, 3).join(' '), true);
             
             videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
-            
-            // Setup video end monitoring
-            setupVideoEndMonitoring();
-        }
-        
-        // Setup video end monitoring
-        function setupVideoEndMonitoring() {
-            // Remove previous listener if exists
-            if (videoEndedListener) {
-                window.removeEventListener('message', videoEndedListener);
-            }
-            
-            // Create new listener
-            videoEndedListener = function(event) {
-                // Check if the message is from YouTube and indicates video ended
-                if (event.origin === 'https://www.youtube.com' && 
-                    event.data === 'ended') {
-                    playNextSuggestedVideo();
-                }
-            };
-            
-            window.addEventListener('message', videoEndedListener);
-        }
-        
-        // Play next suggested video
-        function playNextSuggestedVideo() {
-            const suggestedVideos = suggestedGrid.querySelectorAll('.video-card');
-            if (suggestedVideos.length > 0) {
-                const firstSuggested = suggestedVideos[0];
-                const videoId = firstSuggested.querySelector('img').alt.match(/v=([^&]+)/)?.[1];
-                
-                if (videoId) {
-                    // Find the video data in search results
-                    const videoData = searchResults.find(v => v.videoId === videoId);
-                    if (videoData) {
-                        playVideo(videoData);
-                    }
-                }
-            }
         }
         
         // Back to results
@@ -1108,7 +919,6 @@
             videoPlayerContainer.style.display = 'none';
             videosGrid.style.display = 'grid';
             backButton.style.display = 'none';
-            miniPlayer.style.display = 'none';
             
             // Restore previous search results if available
             if (searchResults.length > 0) {
@@ -1134,34 +944,14 @@
             
             facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
             twitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-            whatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A${encodedUrl}`;
+            whatsappShare.href = `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`;
             
             shareModal.style.display = 'flex';
-        }
-        
-        // Open mini share panel
-        function openMiniSharePanel() {
-            miniShareLink.value = currentVideoUrl;
-            
-            // Set social share links
-            const encodedUrl = encodeURIComponent(currentVideoUrl);
-            const encodedTitle = encodeURIComponent(videoTitle.textContent);
-            
-            miniFacebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-            miniTwitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-            miniWhatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A${encodedUrl}`;
-            
-            miniSharePanel.style.display = 'block';
         }
         
         // Close share modal
         function closeShareModal() {
             shareModal.style.display = 'none';
-        }
-        
-        // Close mini share panel
-        function closeMiniSharePanel() {
-            miniSharePanel.style.display = 'none';
         }
         
         // Copy share link
@@ -1175,30 +965,6 @@
             setTimeout(() => {
                 copyButton.textContent = originalText;
             }, 2000);
-        }
-        
-        // Copy mini share link
-        function copyMiniShareLink() {
-            miniShareLink.select();
-            document.execCommand('copy');
-            
-            const originalText = miniCopyButton.textContent;
-            miniCopyButton.textContent = 'Copiado!';
-            
-            setTimeout(() => {
-                miniCopyButton.textContent = originalText;
-            }, 2000);
-        }
-        
-        // Toggle mini player
-        function toggleMiniPlayer() {
-            if (miniPlayer.style.display === 'block') {
-                miniPlayer.style.display = 'none';
-                closeMiniSharePanel();
-            } else {
-                videoPlayerContainer.style.display = 'none';
-                miniPlayer.style.display = 'block';
-            }
         }
         
         // Handle URL parameters on load
@@ -1280,27 +1046,12 @@
         
         backButton.addEventListener('click', backToResults);
         shareButton.addEventListener('click', openShareModal);
-        minimizeButton.addEventListener('click', toggleMiniPlayer);
         closeShare.addEventListener('click', closeShareModal);
         copyButton.addEventListener('click', copyShareLink);
         homeLink.addEventListener('click', (e) => {
             e.preventDefault();
             backToResults();
             window.history.pushState({}, '', '/');
-        });
-        
-        // Mini player events
-        miniCloseBtn.addEventListener('click', toggleMiniPlayer);
-        miniShareBtn.addEventListener('click', openMiniSharePanel);
-        miniCopyButton.addEventListener('click', copyMiniShareLink);
-        
-        // Close mini share panel when clicking outside
-        document.addEventListener('click', (e) => {
-            if (miniSharePanel.style.display === 'block' && 
-                !miniSharePanel.contains(e.target) && 
-                e.target !== miniShareBtn) {
-                closeMiniSharePanel();
-            }
         });
         
         // Handle back/forward navigation
