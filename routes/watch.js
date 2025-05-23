@@ -9,12 +9,10 @@ router.get('/:id', async (req, res) => {
   const isEmbed = req.path.includes('_embed');
 
   try {
-    // Validar el ID
     if (!id || id.length < 11) {
       return res.status(400).send('ID de video inválido');
     }
 
-    // Hacer una búsqueda por el ID como texto y filtrar
     let searchResults;
     try {
       const result = await yts(id);
@@ -24,7 +22,6 @@ router.get('/:id', async (req, res) => {
       return res.status(502).send('Error al conectar con el servicio de búsqueda');
     }
 
-    // Verificar si se encontró el video
     if (!searchResults) {
       return res.status(404).send('Video no encontrado');
     }
@@ -91,6 +88,11 @@ router.get('/:id', async (req, res) => {
     const initialDataScript = `
       <script>
         window.initialData = ${JSON.stringify(initialData)};
+        window.addEventListener('DOMContentLoaded', () => {
+          if (window.initialData && typeof playVideo === 'function') {
+            playVideo(window.initialData.video);
+          }
+        });
       </script>
     `;
 
