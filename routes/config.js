@@ -1,5 +1,5 @@
 const config = {
-  title: "Tube FlixStream",
+  title: "TubeFlix",
   logo: "#"
 };
 module.exports = config;
