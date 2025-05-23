@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const config = require("../src/config")
+const config = require("./config")
 
 router.get('/', (req, res) => {
   const htmlPath = path.join(__dirname, '../public/index.html');
