@@ -30,7 +30,7 @@ router.get('/', (req, res) => {
   `;
   
   // Inyectar SEO y datos iniciales para el cliente
-  html = html.replace('<title></title>', head);
+  html = html.replace('<title>andresvpn</title>', head);
   
   const initialData = `
     <script>
