@@ -747,7 +747,6 @@
             </div>
         </div>
     </div>
-    
   <script>
     // DOM elements
     const searchInput = document.getElementById('search-input');
@@ -783,6 +782,7 @@
     let currentVideoData = null;
     let searchResults = [];
     let player;
+    let playedVideos = [];
     
     // Format numbers (1,000,000 -> 1M)
     function formatNumber(num) {
@@ -876,8 +876,36 @@
         });
     }
     
+    // Play next video automatically from suggested videos
+    function playNextVideo() {
+        // Get all suggested videos that haven't been played yet
+        const availableVideos = searchResults.filter(video => 
+            video.videoId !== currentVideoId && 
+            !playedVideos.includes(video.videoId) &&
+            suggestedGrid.innerHTML.includes(video.videoId)
+        );
+        
+        if (availableVideos.length > 0) {
+            // Select a random video from available ones
+            const nextVideo = availableVideos[Math.floor(Math.random() * availableVideos.length)];
+            playVideo(nextVideo);
+        } else {
+            // If all suggested videos have been played, reset the played list
+            playedVideos = [];
+            if (searchResults.length > 0) {
+                const nextVideo = searchResults.find(v => v.videoId !== currentVideoId);
+                if (nextVideo) playVideo(nextVideo);
+            }
+        }
+    }
+    
     // Play video
     function playVideo(video) {
+        // Add to played videos list
+        if (!playedVideos.includes(video.videoId)) {
+            playedVideos.push(video.videoId);
+        }
+        
         currentVideoId = video.videoId;
         currentVideoData = video;
         currentVideoUrl = `${window.location.origin}/watch/${video.videoId}`;
@@ -900,7 +928,11 @@
             window.onYouTubeIframeAPIReady = function() {
                 player = new YT.Player('video-iframe', {
                     events: {
-                        'onStateChange': onPlayerStateChange
+                        'onStateChange': function(event) {
+                            if (event.data === YT.PlayerState.ENDED) {
+                                playNextVideo();
+                            }
+                        }
                     }
                 });
             };
@@ -929,34 +961,22 @@
         // Update URL with video ID
         window.history.pushState({ videoId: video.videoId }, '', `/watch/${video.videoId}`);
         
-        // Load suggested videos
-        searchVideos(video.title.split(' ').slice(0, 3).join(' '), true);
+        // Load suggested videos (with different query to avoid same content)
+        const randomQuery = getRandomSearchQuery(video.title);
+        searchVideos(randomQuery, true);
         
         videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
     }
     
-    // Handle YouTube player state changes
-    function onPlayerStateChange(event) {
-        // When video ends (state = 0), play next video
-        if (event.data === YT.PlayerState.ENDED) {
-            playNextVideo();
-        }
-    }
-    
-    // Play next video from suggested videos
-    function playNextVideo() {
-        const suggestedVideos = suggestedGrid.querySelectorAll('.video-card');
-        if (suggestedVideos.length > 0) {
-            // Get the first suggested video data
-            const nextVideo = searchResults.find(video => 
-                video.videoId !== currentVideoId && 
-                suggestedGrid.innerHTML.includes(video.videoId)
-            );
-            
-            if (nextVideo) {
-                playVideo(nextVideo);
-            }
-        }
+    // Generate random search query based on video title
+    function getRandomSearchQuery(title) {
+        const words = title.split(' ').filter(word => word.length > 3);
+        if (words.length === 0) return "videos populares";
+        
+        // Take 2-3 random words from title
+        const count = Math.min(3, Math.max(2, Math.floor(Math.random() * words.length) + 1));
+        const shuffled = words.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count).join(' ');
     }
     
     // Back to results
@@ -1138,7 +1158,7 @@
     
     // Initial load
     handleInitialLoad();
-</script>
+</script>  
 
 </body>
 </html> 
