@@ -27,6 +27,7 @@ router.get('/', (req, res) => {
     <meta property="og:description" content="${seo.description}">
     <meta property="og:url" content="${seo.url}">
     <meta property="og:type" content="website">
+    <link rel="icon" href="${config.logo}" type="image/png">
   `;
   
   // Inyectar SEO y datos iniciales para el cliente
