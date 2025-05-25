@@ -25,6 +25,7 @@ router.get('/', (req, res) => {
     <meta property="og:image" content="${seo.image}">
     <meta property="og:url" content="${seo.url}">
     <meta property="og:type" content="website">
+    <link rel="icon" href="${seo.image}" type="image/png">
     <meta name="twitter:card" content="summary_large_image">
   `;
   
