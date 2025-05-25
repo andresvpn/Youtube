@@ -1,6 +1,6 @@
 const config = {
   title: "MicTube",
-  logo: "#"
+  logo: "/img/logo.png"
 };
 module.exports = config;
 
