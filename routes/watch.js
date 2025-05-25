@@ -66,6 +66,7 @@ router.get('/:id', async (req, res) => {
       <meta name="twitter:player" content="${seo.embedUrl}">
       <meta name="twitter:player:width" content="1280">
       <meta name="twitter:player:height" content="720">
+      <link rel="icon" href="${config.logo}" type="image/png">
     `;
 
     html = html.replace('<title></title>', head);
