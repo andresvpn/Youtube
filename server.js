@@ -5,7 +5,7 @@ const app = express();
 // Configuración básica
 
 
-app.use('/img', express.static('img'));
+app.use('/img', express.static(__dirname + '/img'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
