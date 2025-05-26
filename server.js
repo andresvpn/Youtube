@@ -15,10 +15,15 @@ app.use('/watch', require('./routes/watch'));
 app.use('/search', require('./routes/search'));
 app.use('/api', (req, res, next) => {
   const allowedOrigin = 'https://micTube.vercel.app';
-  const origin = req.get('origin') || req.get('referer');
+  const origin = req.get('origin');
+  const referer = req.get('referer');
 
-  if (origin && origin.startsWith(allowedOrigin)) {
-    next(); // Permitir acceso
+  if (
+    (origin && origin.startsWith(allowedOrigin)) ||
+    (referer && referer.startsWith(allowedOrigin)) ||
+    (!origin && !referer) // permite llamadas internas sin headers
+  ) {
+    next();
   } else {
     res.status(403).json({ error: 'Acceso no autorizado' });
   }
