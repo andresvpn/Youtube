@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="description" content="Disfruta de los mejores videos en PlayTube. Busca, descubre y reproduce contenido de calidad.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -524,6 +525,17 @@
         .social-btn:hover {
             transform: translateY(-3px);
         }
+
+        /* Action buttons container */
+        .action-buttons-container {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+            background: var(--dark-light);
+            padding: 0.5rem;
+            border-radius: 12px;
+            align-items: center;
+        }
         
         /* Responsive mejorado */
         @media (max-width: 1200px) {
@@ -568,11 +580,16 @@
             }
             
             .action-button span {
-                display: none;
+                display: inline !important; /* Mostrar texto en móvil */
             }
             
             .action-button {
-                padding: 0.5rem;
+                padding: 0.5rem 0.8rem;
+            }
+
+            .action-buttons-container {
+                padding: 0.3rem;
+                gap: 0.5rem;
             }
         }
         
@@ -674,10 +691,14 @@
                     <span id="video-date">• hace 0 días</span>
                     <span id="video-duration">• 0:00</span>
                     
-                    <div class="video-actions">
+                    <div class="action-buttons-container">
                         <button class="action-button" id="share-button">
                             <i class="fas fa-share-alt"></i>
                             <span>Compartir</span>
+                        </button>
+                        <button class="action-button" id="download-button">
+                            <i class="fas fa-download"></i>
+                            <span>Descargar</span>
                         </button>
                     </div>
                 </div>
@@ -765,6 +786,7 @@
     const suggestedVideos = document.getElementById('suggested-videos');
     const suggestedGrid = document.getElementById('suggested-grid');
     const shareButton = document.getElementById('share-button');
+    const downloadButton = document.getElementById('download-button');
     const shareModal = document.getElementById('share-modal');
     const closeShare = document.getElementById('close-share');
     const shareLink = document.getElementById('share-link');
@@ -1030,6 +1052,13 @@
             copyButton.textContent = originalText;
         }, 2000);
     }
+
+    // Handle download
+    function handleDownload() {
+        if (currentVideoId) {
+            window.location.href = `/download/${currentVideoId}`;
+        }
+    }
     
     // Handle URL parameters on load
     function handleInitialLoad() {
@@ -1110,6 +1139,7 @@
     
     backButton.addEventListener('click', backToResults);
     shareButton.addEventListener('click', openShareModal);
+    downloadButton.addEventListener('click', handleDownload);
     closeShare.addEventListener('click', closeShareModal);
     copyButton.addEventListener('click', copyShareLink);
     homeLink.addEventListener('click', (e) => {
@@ -1160,4 +1190,4 @@
 </script>  
 
 </body>
-</html> 
+</html>
