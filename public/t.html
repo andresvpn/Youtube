@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta name="description" content="Disfruta de los mejores videos en PlayTube. Busca, descubre y reproduce contenido de calidad.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -38,7 +37,6 @@
             overflow-x: hidden;
         }
         
-        /* Header mejorado */
         header {
             display: flex;
             flex-direction: column;
@@ -114,14 +112,12 @@
             color: var(--primary);
         }
         
-        /* Main content */
         .main-content {
             padding: 1.5rem;
             max-width: 1600px;
             margin: 0 auto;
         }
         
-        /* Video player */
         .video-player-container {
             width: 100%;
             margin-bottom: 2rem;
@@ -144,6 +140,11 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+        }
+        
         .video-info {
             margin-top: 1.5rem;
             padding: 0 0.5rem;
@@ -163,16 +164,20 @@
             font-size: 0.95rem;
             margin-bottom: 1rem;
             align-items: center;
+            justify-content: space-between;
         }
         
         .video-actions {
             display: flex;
-            gap: 1rem;
-            margin-left: auto;
+            gap: 0.8rem;
+            margin: 0 auto;
+            background: var(--dark-light);
+            padding: 0.5rem;
+            border-radius: 20px;
         }
         
         .action-button {
-            background: var(--dark-light);
+            background: transparent;
             color: var(--light);
             border: none;
             padding: 0.5rem 1rem;
@@ -183,6 +188,7 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
         
         .action-button:hover {
@@ -210,7 +216,6 @@
             font-weight: bold;
         }
         
-        /* Minimize button */
         .minimize-button {
             position: absolute;
             top: 15px;
@@ -233,7 +238,6 @@
             background: var(--primary);
         }
         
-        /* Mini player mejorado */
         .mini-player {
             position: fixed;
             bottom: 20px;
@@ -284,7 +288,6 @@
             background: var(--primary);
         }
         
-        /* Videos grid */
         .videos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -351,7 +354,6 @@
             line-height: 1.4;
         }
         
-        /* Loader */
         .loader {
             display: none;
             justify-content: center;
@@ -373,7 +375,6 @@
             }
         }
         
-        /* No results */
         .no-results {
             grid-column: 1/-1;
             text-align: center;
@@ -381,7 +382,6 @@
             color: var(--gray);
         }
         
-        /* Back button */
         .back-button {
             display: none;
             background: var(--dark-light);
@@ -402,7 +402,6 @@
             color: var(--dark);
         }
         
-        /* Suggested videos */
         .suggested-videos {
             margin-top: 3rem;
         }
@@ -420,7 +419,6 @@
             color: var(--primary);
         }
         
-        /* Share modal */
         .share-modal {
             position: fixed;
             top: 0;
@@ -526,7 +524,6 @@
             transform: translateY(-3px);
         }
         
-        /* Responsive mejorado */
         @media (max-width: 1200px) {
             .main-content {
                 padding: 1.2rem;
@@ -534,10 +531,16 @@
         }
         
         @media (max-width: 992px) {
+            .video-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
             .video-actions {
-                margin-left: 0;
+                margin: 0;
                 width: 100%;
-                justify-content: flex-start;
+                justify-content: center;
             }
         }
         
@@ -569,11 +572,12 @@
             }
             
             .action-button span {
-                display: none;
+                display: inline !important;
             }
             
             .action-button {
-                padding: 0.5rem;
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
             }
         }
         
@@ -620,6 +624,11 @@
                 border-radius: 6px;
                 padding: 0.8rem;
             }
+            
+            .video-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
         }
         
         @media (max-width: 400px) {
@@ -627,9 +636,13 @@
                 width: 180px;
                 height: 100px;
             }
+            
+            .action-button {
+                padding: 0.5rem;
+                font-size: 0.75rem;
+            }
         }
  </style>
-    <!-- Header mejorado -->
     <header>
         <div class="header-top">
             <a href="/" class="logo" id="home-link">
@@ -646,15 +659,12 @@
         </div>
     </header>
     
-    <!-- Main content -->
     <div class="main-content">
-        <!-- Back button -->
         <button class="back-button" id="back-button">
             <i class="fas fa-arrow-left"></i>
             Volver a los resultados
         </button>
         
-        <!-- Video player -->
         <div class="video-player-container" id="video-player-container">
             <div class="video-player">
                 <iframe 
@@ -671,14 +681,24 @@
                 <h1 class="video-title" id="video-title">Título del video</h1>
                 
                 <div class="video-meta">
-                    <span id="video-views">0 visualizaciones</span>
-                    <span id="video-date">• hace 0 días</span>
-                    <span id="video-duration">• 0:00</span>
+                    <div class="video-stats">
+                        <span id="video-views">0 visualizaciones</span>
+                        <span id="video-date">• hace 0 días</span>
+                        <span id="video-duration">• 0:00</span>
+                    </div>
                     
-                    <div class="video-actions">
+                    <div class="video-actions" id="video-actions">
                         <button class="action-button" id="share-button">
                             <i class="fas fa-share-alt"></i>
                             <span>Compartir</span>
+                        </button>
+                        <button class="action-button" id="download-mp4-button">
+                            <i class="fas fa-download"></i>
+                            <span>MP4</span>
+                        </button>
+                        <button class="action-button" id="download-mp3-button">
+                            <i class="fas fa-music"></i>
+                            <span>MP3</span>
                         </button>
                     </div>
                 </div>
@@ -689,35 +709,28 @@
                 </div>
             </div>
             
-            <!-- Suggested videos -->
             <div class="suggested-videos" id="suggested-videos">
                 <h2 class="suggested-title">
                     <i class="fas fa-play-circle"></i>
                     Videos relacionados
                 </h2>
                 <div class="videos-grid" id="suggested-grid">
-                    <!-- Suggested videos will load here -->
                 </div>
             </div>
         </div>
         
-        <!-- Videos grid -->
         <div class="videos-grid" id="videos-grid">
-            <!-- Videos will load here -->
         </div>
         
-        <!-- Loader -->
         <div class="loader" id="loader">
             <div class="loader-spinner"></div>
         </div>
         
-        <!-- No results -->
         <div class="no-results" id="no-results" style="display: none;">
             No se encontraron videos. Intenta con otra búsqueda.
         </div>
     </div>
     
-    <!-- Share modal -->
     <div class="share-modal" id="share-modal">
         <div class="share-content">
             <div class="share-header">
@@ -748,7 +761,10 @@
         </div>
     </div>
   <script>
-    // DOM elements
+    const config = {
+        downloads: false
+    };
+
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
     const videosGrid = document.getElementById('videos-grid');
@@ -766,6 +782,9 @@
     const suggestedVideos = document.getElementById('suggested-videos');
     const suggestedGrid = document.getElementById('suggested-grid');
     const shareButton = document.getElementById('share-button');
+    const downloadMp4Button = document.getElementById('download-mp4-button');
+    const downloadMp3Button = document.getElementById('download-mp3-button');
+    const videoActions = document.getElementById('video-actions');
     const shareModal = document.getElementById('share-modal');
     const closeShare = document.getElementById('close-share');
     const shareLink = document.getElementById('share-link');
@@ -775,7 +794,6 @@
     const whatsappShare = document.getElementById('whatsapp-share');
     const homeLink = document.getElementById('home-link');
     
-    // State variables
     let currentSearchTerm = '';
     let currentVideoId = '';
     let currentVideoUrl = '';
@@ -784,7 +802,14 @@
     let player;
     let playedVideos = [];
     
-    // Format numbers (1,000,000 -> 1M)
+    function initDownloadButtons() {
+        if (!config.downloads) {
+            downloadMp4Button.style.display = 'none';
+            downloadMp3Button.style.display = 'none';
+            videoActions.style.justifyContent = 'center';
+        }
+    }
+    
     function formatNumber(num) {
         if (!num) return 'N/A';
         if (num >= 1000000) {
@@ -796,7 +821,6 @@
         return num.toString();
     }
     
-    // Get channel initials
     function getInitials(name) {
         if (!name) return '';
         return name.split(' ')
@@ -806,7 +830,6 @@
             .substring(0, 2);
     }
     
-    // Search videos
     async function searchVideos(query, showSuggestions = false) {
         if (!query) return;
         
@@ -824,11 +847,9 @@
                 if (showSuggestions) {
                     displayVideos(data.data, suggestedGrid);
                 } else {
-                    searchResults = data.data; // Guardar los resultados para poder volver
+                    searchResults = data.data;
                     displayVideos(data.data, videosGrid);
                     currentSearchTerm = query;
-                    
-                    // Update URL without reload
                     const newUrl = `/search?q=${encodeURIComponent(query)}`;
                     window.history.pushState({ path: newUrl }, '', newUrl);
                 }
@@ -848,7 +869,6 @@
         }
     }
     
-    // Display videos in grid
     function displayVideos(videos, gridElement) {
         gridElement.innerHTML = '';
         
@@ -876,9 +896,7 @@
         });
     }
     
-    // Play next video automatically from suggested videos
     function playNextVideo() {
-        // Get all suggested videos that haven't been played yet
         const availableVideos = searchResults.filter(video => 
             video.videoId !== currentVideoId && 
             !playedVideos.includes(video.videoId) &&
@@ -886,11 +904,9 @@
         );
         
         if (availableVideos.length > 0) {
-            // Select a random video from available ones
             const nextVideo = availableVideos[Math.floor(Math.random() * availableVideos.length)];
             playVideo(nextVideo);
         } else {
-            // If all suggested videos have been played, reset the played list
             playedVideos = [];
             if (searchResults.length > 0) {
                 const nextVideo = searchResults.find(v => v.videoId !== currentVideoId);
@@ -899,9 +915,7 @@
         }
     }
     
-    // Play video
     function playVideo(video) {
-        // Add to played videos list
         if (!playedVideos.includes(video.videoId)) {
             playedVideos.push(video.videoId);
         }
@@ -912,11 +926,9 @@
         
         const embedUrl = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0&enablejsapi=1`;
         
-        // Set iframe source
         if (videoIframe.src !== embedUrl) {
             videoIframe.src = embedUrl;
             
-            // Load YouTube API script if not already loaded
             if (!window.YT) {
                 const tag = document.createElement('script');
                 tag.src = "https://www.youtube.com/iframe_api";
@@ -924,7 +936,6 @@
                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
             }
             
-            // Initialize player when API is ready
             window.onYouTubeIframeAPIReady = function() {
                 player = new YT.Player('video-iframe', {
                     events: {
@@ -938,101 +949,82 @@
             };
         }
         
-        // Show player and hide grid
         videoPlayerContainer.style.display = 'block';
         videosGrid.style.display = 'none';
         backButton.style.display = 'flex';
-        
         noResults.style.display = 'none';
-        
-        // Update video info
         videoTitle.textContent = video.title || 'Título no disponible';
         videoViews.textContent = video.views ? formatNumber(video.views) + ' visualizaciones' : 'Visualizaciones no disponibles';
         videoDate.textContent = video.ago ? '• ' + video.ago : '';
-        
-        // Mostrar la duración correctamente
         const duration = video.duration?.timestamp || video.timestamp || '';
         videoDuration.textContent = duration ? '• ' + duration : '';
-        
         const author = video.author?.name || 'Canal desconocido';
         authorName.textContent = author;
         authorAvatar.textContent = getInitials(author);
-        
-        // Update URL with video ID
         window.history.pushState({ videoId: video.videoId }, '', `/watch/${video.videoId}`);
-        
-        // Load suggested videos (with different query to avoid same content)
         const randomQuery = getRandomSearchQuery(video.title);
         searchVideos(randomQuery, true);
-        
         videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
     }
     
-    // Generate random search query based on video title
     function getRandomSearchQuery(title) {
         const words = title.split(' ').filter(word => word.length > 3);
         if (words.length === 0) return "videos populares";
-        
-        // Take 2-3 random words from title
         const count = Math.min(3, Math.max(2, Math.floor(Math.random() * words.length) + 1));
         const shuffled = words.sort(() => 0.5 - Math.random());
         return shuffled.slice(0, count).join(' ');
     }
     
-    // Back to results
     function backToResults() {
         videoPlayerContainer.style.display = 'none';
         videosGrid.style.display = 'grid';
         backButton.style.display = 'none';
-        
-        // Restore previous search results if available
         if (searchResults.length > 0) {
             displayVideos(searchResults, videosGrid);
         }
-        
-        // Update URL with search query or home
         const newUrl = currentSearchTerm ? 
             `/search?q=${encodeURIComponent(currentSearchTerm)}` : 
             '/';
         window.history.pushState({}, '', newUrl);
-        
         videosGrid.scrollIntoView({ behavior: 'smooth' });
     }
     
-    // Open share modal
     function openShareModal() {
         shareLink.value = currentVideoUrl;
-        
-        // Set social share links
         const encodedUrl = encodeURIComponent(currentVideoUrl);
         const encodedTitle = encodeURIComponent(videoTitle.textContent);
-        
         facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
         twitterShare.href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
         whatsappShare.href = `https://wa.me/?text=${encodedTitle}%0A%0A${encodedUrl}`;
-        
         shareModal.style.display = 'flex';
     }
     
-    // Close share modal
     function closeShareModal() {
         shareModal.style.display = 'none';
     }
     
-    // Copy share link
     function copyShareLink() {
         shareLink.select();
         document.execCommand('copy');
-        
         const originalText = copyButton.textContent;
         copyButton.textContent = 'Copiado!';
-        
         setTimeout(() => {
             copyButton.textContent = originalText;
         }, 2000);
     }
+
+    function handleDownloadMp4() {
+        if (currentVideoId) {
+            window.location.href = `/download/mp4/${currentVideoId}`;
+        }
+    }
+
+    function handleDownloadMp3() {
+        if (currentVideoId) {
+            window.location.href = `/download/mp3/${currentVideoId}`;
+        }
+    }
     
-    // Handle URL parameters on load
     function handleInitialLoad() {
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = window.location.pathname.startsWith('/watch/') ? 
@@ -1040,7 +1032,6 @@
         const searchQuery = urlParams.get('q');
         
         if (videoId) {
-            // Load video directly if ID is in URL
             const videoData = {
                 videoId: videoId,
                 title: 'Video cargado desde URL',
@@ -1052,7 +1043,6 @@
             };
             playVideo(videoData);
             
-            // Fetch actual video data
             fetch(`/api/video/${videoId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -1061,11 +1051,9 @@
                     }
                 });
         } else if (window.location.pathname.startsWith('/search') && searchQuery) {
-            // Perform search if query is in URL
             searchInput.value = searchQuery;
             searchVideos(searchQuery);
         } else {
-            // Default search
             const frases = [
                 "cosas que no sabías hace 5 minutos",
                 "te lo resumí",
@@ -1077,16 +1065,11 @@
                 "lo más visto hoy",
                 "resumen rápido"
             ];
-
-            // Elegir una frase al azar
             const random = frases[Math.floor(Math.random() * frases.length)];
-
-            // Llamar a tu función con esa frase
             searchVideos(random);
         }
     }
     
-    // Event listeners
     searchButton.addEventListener('click', () => {
         const query = searchInput.value.trim();
         if (query) {
@@ -1111,6 +1094,8 @@
     
     backButton.addEventListener('click', backToResults);
     shareButton.addEventListener('click', openShareModal);
+    downloadMp4Button.addEventListener('click', handleDownloadMp4);
+    downloadMp3Button.addEventListener('click', handleDownloadMp3);
     closeShare.addEventListener('click', closeShareModal);
     copyButton.addEventListener('click', copyShareLink);
     homeLink.addEventListener('click', (e) => {
@@ -1119,7 +1104,6 @@
         window.history.pushState({}, '', '/');
     });
     
-    // Handle back/forward navigation
     window.addEventListener('popstate', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = window.location.pathname.startsWith('/watch/') ? 
@@ -1139,26 +1123,16 @@
             searchVideos(searchQuery);
             backToResults();
         } else {
-            const frases = [
-                "cosas que no sabías hace 5 minutos",
-                "te lo resumí",
-                "videos más virales",
-                "datos curiosos",
-                "top 10 del mundo",
-                "sabías que",
-                "video resumen",
-                "lo más visto hoy",
-                "resumen rápido"
-            ];
+            const generosYouTube = ["vlogs diarios", "comedia", "gameplays", "reacciones", "retos", "documentales", "tutoriales", "unboxings", "reviews", "noticias", "ciencia", "curiosidades", "top 10", "historias reales", "terror", "misterios", "shorts", "podcast", "entrevistas", "tecnología", "viajes", "moda", "maquillaje", "skincare", "estilo de vida", "motivación", "autoayuda", "psicología", "conspiraciones", "educación", "aprende algo nuevo", "cocina", "recetas fáciles", "humor negro", "historias animadas", "resúmenes de películas", "series resumidas", "películas explicadas", "películas en 10 minutos", "fitness", "entrenamiento en casa", "meditación", "ASMR", "covers", "música original", "parodias", "canciones virales", "lo-fi", "freestyle", "rap", "freestyle battles", "reggaetón", "k-pop", "clásicos", "electrónica", "beatbox", "moda urbana", "críticas de cine", "reseñas honestas", "cine independiente", "animación", "arte digital", "diseño gráfico", "dibujo", "cómics", "anime", "cosplay", "juegos de terror", "minecraft", "fortnite", "roblox", "among us", "valorant", "lol", "fifa", "streaming", "clips de twitch", "setup gamer", "trucos de juegos", "hackeos mentales", "contenido educativo", "datos históricos", "biografías", "historia del mundo", "religión", "filosofía", "teorías locas", "preguntas incómodas", "storytimes", "confesiones", "cuentos reales", "casos criminales", "crimen real", "documentales de asesinos", "casos sin resolver", "experimentos", "inventos", "tecnología futurista", "IA", "robots", "reviews de gadgets", "apple vs android", "comparativas", "compras en línea", "lo mejor de Amazon", "trucos de vida", "lifehacks", "videos satisfactorios", "fails", "momentos incómodos", "videos de animales", "mascotas graciosas", "gatos", "perros", "reptiles", "acuarismo", "videos de bebés", "niños genios", "talentos ocultos", "viral en TikTok", "videos prohibidos", "cosas que no sabías", "explicaciones rápidas", "humor latino", "sketches", "doblajes graciosos", "videos doblados", "videos sin sentido", "absurdos virales", "creepy pasta", "videos perturbadores", "historias de terror", "misterios del internet", "zonas prohibidas", "videos de fantasmas", "exploración urbana", "lugares abandonados", "lo más extraño", "videos censurados", "youtube oscuro", "teorías de disney", "teorías de pixar", "universo cinematográfico", "finales alternativos", "películas filtradas", "trailers reaccionados", "comparando películas", "vs épico", "batallas de rap", "improvisación", "actores de doblaje", "detrás de cámaras", "efectos especiales", "edición de video", "cómo ser youtuber", "ganar dinero en youtube", "monetización", "youtube shorts ideas", "algoritmo de youtube", "historias inspiradoras", "videos motivadores", "dejar el trabajo", "viajar sin dinero", "historias de éxito", "negocios online", "emprendimiento", "finanzas personales", "ahorro", "inversiones", "criptomonedas", "NFTs", "dinero fácil", "dropshipping", "trading", "casos de éxito", "cómo ganar dinero", "trabajo remoto", "productividad", "organización", "minimalismo", "videos estéticos", "rutinas de mañana", "rutinas de noche", "hacks escolares", "vida universitaria", "exámenes", "trucos para estudiar", "cómo aprender rápido", "idiomas", "aprender inglés", "francés fácil", "idiomas con IA", "apps útiles", "apps educativas", "comparativas de apps", "videos de realidad virtual", "metaverso", "gaming extremo", "juegos nuevos", "beta testers", "early access", "juegos cancelados", "mods increíbles", "historias del gaming", "todo sobre consolas", "colecciones retro", "speedruns", "mods absurdos", "simuladores raros", "juegos para reír", "gameplays graciosos", "videojuegos de miedo", "historias de streamers", "top canales de youtube"];
             const random = frases[Math.floor(Math.random() * frases.length)];
             searchVideos(random);
             backToResults();
         }
     });
-    
-    // Initial load
+
+    initDownloadButtons();
     handleInitialLoad();
 </script>  
 
 </body>
-</html> 
+</html>
