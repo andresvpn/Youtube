@@ -173,11 +173,11 @@
         
         .video-actions {
             display: flex;
-            gap: 1rem;
-            margin: 0 auto;
+            gap: 0.8rem;
+            margin-left: auto;
             background: var(--dark-light);
             padding: 0.5rem;
-            border-radius: 12px;
+            border-radius: 20px;
         }
         
         .action-button {
@@ -192,6 +192,7 @@
             align-items: center;
             gap: 0.5rem;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
         
         .action-button:hover {
@@ -550,9 +551,9 @@
             }
             
             .video-actions {
-                margin: 0;
+                margin-left: 0;
                 width: 100%;
-                justify-content: center;
+                justify-content: flex-start;
             }
         }
         
@@ -641,12 +642,6 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
-            
-            .action-button {
-                flex: 1;
-                min-width: 120px;
-                justify-content: center;
-            }
         }
         
         @media (max-width: 400px) {
@@ -657,7 +652,7 @@
             
             .action-button {
                 padding: 0.5rem;
-                min-width: 100px;
+                font-size: 0.75rem;
             }
         }
  </style>
@@ -839,6 +834,7 @@
         if (!config.downloads) {
             downloadMp4Button.style.display = 'none';
             downloadMp3Button.style.display = 'none';
+            videoActions.style.justifyContent = 'flex-end';
         }
     }
     
