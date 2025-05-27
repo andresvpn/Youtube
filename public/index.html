@@ -139,6 +139,14 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
+     #video-iframe iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+     #video-iframe {
+  width: 100%;
+  height: 100%;
+}
         
         .video-player div {
             width: 100%;
@@ -630,6 +638,7 @@
                 justify-content: center;
             }
         }
+     
         
         @media (max-width: 400px) {
             .mini-player {
@@ -956,6 +965,8 @@
         }
         
         player = new YT.Player('video-iframe', {
+            width: '100%',
+            height: '100%',
             videoId: videoId,
             playerVars: {
                 autoplay: 1,
